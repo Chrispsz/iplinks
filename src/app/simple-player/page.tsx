@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Tv, Loader2, RefreshCw, Copy, Check, ArrowLeft, Play, Cast, LogOut, Trash2, AlertCircle } from 'lucide-react'
+import { Tv, Loader2, RefreshCw, Copy, Check, ArrowLeft, Play, Cast, LogOut, Trash2, AlertCircle, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,6 +18,16 @@ interface Channel {
   name: string
   stream_icon?: string
 }
+
+// Canais fixos (sempre disponíveis)
+const FIXED_CHANNELS = [
+  {
+    id: 'jornal-paraiba',
+    name: 'Jornal da Paraiba',
+    url: 'https://171942.global.ssl.fastly.net/61df20a18ecf869e0a58a4fc/live_029d87c0746511ec978d3983d0d34e88/tracks-v1a1/mono.ts.m3u8',
+    icon: '📺'
+  }
+]
 
 export default function SimplePlayerPage() {
   const [host, setHost] = useState('')
@@ -49,6 +59,16 @@ export default function SimplePlayerPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }, [getStreamUrl])
 
+  // Copiar URL de canal fixo
+  const copyFixedUrl = useCallback((channelId: string) => {
+    const channel = FIXED_CHANNELS.find(c => c.id === channelId)
+    if (channel) {
+      navigator.clipboard.writeText(channel.url)
+      setCopiedId(channelId)
+      setTimeout(() => setCopiedId(null), 2000)
+    }
+  }, [])
+
   // Abrir seletor de players (MÉTODO CORRETO 2025)
   const openExternalChooser = useCallback((channel: Channel) => {
     const url = getStreamUrl(channel.stream_id)
@@ -72,6 +92,27 @@ export default function SimplePlayerPage() {
       window.location.href = url
     }
   }, [getStreamUrl])
+
+  // Abrir canal fixo no seletor de players
+  const openFixedChannel = useCallback((url: string) => {
+    const intentChooser = `intent://play/?url=${encodeURIComponent(url)}#Intent;action=android.intent.action.VIEW;type=video/*;category=android.intent.category.BROWSABLE;end`
+    const universalIntent = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;type=application/x-mpegURL;end`
+
+    try {
+      window.location.href = universalIntent
+      setTimeout(() => {
+        window.location.href = intentChooser
+      }, 500)
+    } catch {
+      window.location.href = url
+    }
+  }, [])
+
+  // Abrir canal fixo no WVC
+  const openFixedWvc = useCallback((channel: typeof FIXED_CHANNELS[0]) => {
+    const intent = `intent://open?url=${encodeURIComponent(channel.url)}&title=${encodeURIComponent(channel.name)}#Intent;scheme=wvc-x-callback;package=com.instantbits.cast.webvideo;end`
+    window.location.href = intent
+  }, [])
 
   // Abrir no Web Video Caster (para TV via Chromecast)
   const openWvc = useCallback((channel: Channel) => {
@@ -322,6 +363,59 @@ export default function SimplePlayerPage() {
             <div className="text-center text-xs text-slate-500">
               <p>Funciona com qualquer servidor Xtream Codes</p>
               <p className="mt-1">▶ Player (MX/VLC/Kodi) • 🟣 Chromecast • 📋 Copiar</p>
+            </div>
+          </div>
+        )}
+
+        {/* Canais Fixos - Sempre visível */}
+        {!selectedCategory && (
+          <div className="pt-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Radio className="h-5 w-5 text-red-500" />
+              <h2 className="text-xl font-bold">Canais Abertos</h2>
+            </div>
+            <div className="space-y-2">
+              {FIXED_CHANNELS.map((channel) => (
+                <div
+                  key={channel.id}
+                  className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{channel.icon}</span>
+                    <span className="font-medium">{channel.name}</span>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={() => openFixedChannel(channel.url)}
+                      variant="ghost"
+                      size="sm"
+                      title="Selecionar player (MX, VLC, Kodi...)"
+                    >
+                      <Play className="h-4 w-4 text-emerald-500" />
+                    </Button>
+                    <Button
+                      onClick={() => openFixedWvc(channel)}
+                      variant="ghost"
+                      size="sm"
+                      title="Web Video Caster (Chromecast)"
+                    >
+                      <Cast className="h-4 w-4 text-purple-500" />
+                    </Button>
+                    <Button
+                      onClick={() => copyFixedUrl(channel.id)}
+                      variant="ghost"
+                      size="sm"
+                      title="Copiar URL"
+                    >
+                      {copiedId === channel.id ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
