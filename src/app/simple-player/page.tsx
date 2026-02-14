@@ -367,81 +367,82 @@ export default function SimplePlayerPage() {
           </div>
         )}
 
-        {/* Canais Fixos - Sempre visível */}
-        {!selectedCategory && (
-          <div className="pt-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Radio className="h-5 w-5 text-red-500" />
-              <h2 className="text-xl font-bold">Canais Abertos</h2>
-            </div>
-            <div className="space-y-2">
-              {FIXED_CHANNELS.map((channel) => (
-                <div
-                  key={channel.id}
-                  className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{channel.icon}</span>
-                    <span className="font-medium">{channel.name}</span>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      onClick={() => openFixedChannel(channel.url)}
-                      variant="ghost"
-                      size="sm"
-                      title="Selecionar player (MX, VLC, Kodi...)"
-                    >
-                      <Play className="h-4 w-4 text-emerald-500" />
-                    </Button>
-                    <Button
-                      onClick={() => openFixedWvc(channel)}
-                      variant="ghost"
-                      size="sm"
-                      title="Web Video Caster (Chromecast)"
-                    >
-                      <Cast className="h-4 w-4 text-purple-500" />
-                    </Button>
-                    <Button
-                      onClick={() => copyFixedUrl(channel.id)}
-                      variant="ghost"
-                      size="sm"
-                      title="Copiar URL"
-                    >
-                      {copiedId === channel.id ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Categorias */}
         {categories.length > 0 && !selectedCategory && (
-          <div className="pt-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Categorias ({categories.length})</h2>
-              {serverUrl && (
-                <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">
-                  Servidor: {serverUrl.split(':')[0]}
-                </span>
-              )}
+          <div className="pt-4 space-y-6">
+            {/* Campeonato Paraibano - Canal Fixo */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Radio className="h-5 w-5 text-red-500" />
+                <h2 className="text-lg font-bold">Campeonato Paraibano</h2>
+              </div>
+              <div className="space-y-2">
+                {FIXED_CHANNELS.map((channel) => (
+                  <div
+                    key={channel.id}
+                    className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{channel.icon}</span>
+                      <span className="font-medium">{channel.name}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        onClick={() => openFixedChannel(channel.url)}
+                        variant="ghost"
+                        size="sm"
+                        title="Selecionar player (MX, VLC, Kodi...)"
+                      >
+                        <Play className="h-4 w-4 text-emerald-500" />
+                      </Button>
+                      <Button
+                        onClick={() => openFixedWvc(channel)}
+                        variant="ghost"
+                        size="sm"
+                        title="Web Video Caster (Chromecast)"
+                      >
+                        <Cast className="h-4 w-4 text-purple-500" />
+                      </Button>
+                      <Button
+                        onClick={() => copyFixedUrl(channel.id)}
+                        variant="ghost"
+                        size="sm"
+                        title="Copiar URL"
+                      >
+                        {copiedId === channel.id ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category.category_id}
-                  onClick={() => loadChannels(category)}
-                  variant="outline"
-                  className="h-12 px-4 border-slate-600 hover:border-blue-500"
-                >
-                  {category.category_name}
-                </Button>
-              ))}
+
+            {/* Categorias IPTV */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold">Categorias ({categories.length})</h2>
+                {serverUrl && (
+                  <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">
+                    Servidor: {serverUrl.split(':')[0]}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <Button
+                    key={category.category_id}
+                    onClick={() => loadChannels(category)}
+                    variant="outline"
+                    className="h-12 px-4 border-slate-600 hover:border-blue-500"
+                  >
+                    {category.category_name}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         )}
