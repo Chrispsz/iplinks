@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Tv, Loader2, RefreshCw, Copy, Check, ArrowLeft, Play, LogOut, Trash2, AlertCircle, Radio } from 'lucide-react'
+import { Tv, Loader2, RefreshCw, ArrowLeft, Play, LogOut, Trash2, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -45,7 +45,6 @@ export default function SimplePlayerPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [copiedId, setCopiedId] = useState<string | null>(null)
   const [serverUrl, setServerUrl] = useState('')
   const [savedAccount, setSavedAccount] = useState<IptvAccount | null>(null)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
@@ -56,24 +55,6 @@ export default function SimplePlayerPage() {
     const fullHost = streamHost.includes(':') ? streamHost : `${streamHost}:80`
     return `http://${fullHost}/live/${username}/${password}/${streamId}.m3u8`
   }, [host, serverUrl, username, password])
-
-  // Copiar URL
-  const copyUrl = useCallback((channel: Channel) => {
-    const url = getStreamUrl(channel.stream_id)
-    navigator.clipboard.writeText(url)
-    setCopiedId(channel.stream_id)
-    setTimeout(() => setCopiedId(null), 2000)
-  }, [getStreamUrl])
-
-  // Copiar URL de canal fixo
-  const copyFixedUrl = useCallback((channelId: string) => {
-    const channel = FIXED_CHANNELS.find(c => c.id === channelId)
-    if (channel) {
-      navigator.clipboard.writeText(channel.url)
-      setCopiedId(channelId)
-      setTimeout(() => setCopiedId(null), 2000)
-    }
-  }, [])
 
   // Abrir seletor de players (MÉTODO CORRETO 2025)
   const openExternalChooser = useCallback((channel: Channel) => {
@@ -354,7 +335,7 @@ export default function SimplePlayerPage() {
 
             <div className="text-center text-xs text-slate-500">
               <p>Funciona com qualquer servidor Xtream Codes</p>
-              <p className="mt-1">▶ Player (MX/VLC/Kodi) • 📋 Copiar URL</p>
+              <p className="mt-1">▶ Toque para abrir no player</p>
             </div>
           </div>
         )}
@@ -372,32 +353,12 @@ export default function SimplePlayerPage() {
                 {FIXED_CHANNELS.map((channel) => (
                   <div
                     key={channel.id}
-                    className="flex flex-col p-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
+                    className="flex flex-col p-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50 cursor-pointer"
+                    onClick={() => openFixedChannel(channel.url)}
                   >
-                    <span className="font-medium text-sm text-center mb-2">{channel.name}</span>
-                    <div className="flex justify-center gap-1">
-                      <Button
-                        onClick={() => openFixedChannel(channel.url)}
-                        variant="ghost"
-                        size="sm"
-                        title="Player"
-                        className="h-8 w-8 p-0"
-                      >
-                        <Play className="h-4 w-4 text-emerald-500" />
-                      </Button>
-                      <Button
-                        onClick={() => copyFixedUrl(channel.id)}
-                        variant="ghost"
-                        size="sm"
-                        title="Copiar"
-                        className="h-8 w-8 p-0"
-                      >
-                        {copiedId === channel.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
+                    <span className="font-medium text-sm text-center mb-1">{channel.name}</span>
+                    <div className="flex justify-center">
+                      <Play className="h-5 w-5 text-emerald-500" />
                     </div>
                   </div>
                 ))}
@@ -449,33 +410,11 @@ export default function SimplePlayerPage() {
               {filteredChannels.map((channel) => (
                 <div
                   key={channel.stream_id}
-                  className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-600"
+                  className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-slate-600 cursor-pointer"
+                  onClick={() => openExternalChooser(channel)}
                 >
                   <span className="truncate flex-1">{channel.name}</span>
-                  <div className="flex gap-1">
-                    {/* Player Externo - PEGA TUDO (MX, VLC, Kodi...) */}
-                    <Button
-                      onClick={() => openExternalChooser(channel)}
-                      variant="ghost"
-                      size="sm"
-                      title="Selecionar player (MX, VLC, Kodi...)"
-                    >
-                      <Play className="h-4 w-4 text-emerald-500" />
-                    </Button>
-                    {/* Copiar URL */}
-                    <Button
-                      onClick={() => copyUrl(channel)}
-                      variant="ghost"
-                      size="sm"
-                      title="Copiar URL"
-                    >
-                      {copiedId === channel.stream_id ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <Play className="h-5 w-5 text-emerald-500 flex-shrink-0" />
                 </div>
               ))}
             </div>
