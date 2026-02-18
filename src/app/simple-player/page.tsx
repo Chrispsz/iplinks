@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Tv, Loader2, RefreshCw, Copy, Check, ArrowLeft, Play, Cast, LogOut, Trash2, AlertCircle, Radio } from 'lucide-react'
+import { Tv, Loader2, RefreshCw, Copy, Check, ArrowLeft, Play, LogOut, Trash2, AlertCircle, Radio } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -113,20 +113,6 @@ export default function SimplePlayerPage() {
       window.location.href = url
     }
   }, [])
-
-  // Abrir canal fixo no WVC
-  const openFixedWvc = useCallback((channel: typeof FIXED_CHANNELS[0]) => {
-    const intent = `intent://open?url=${encodeURIComponent(channel.url)}&title=${encodeURIComponent(channel.name)}#Intent;scheme=wvc-x-callback;package=com.instantbits.cast.webvideo;end`
-    window.location.href = intent
-  }, [])
-
-  // Abrir no Web Video Caster (para TV via Chromecast)
-  const openWvc = useCallback((channel: Channel) => {
-    const url = getStreamUrl(channel.stream_id)
-    const title = encodeURIComponent(channel.name)
-    const intent = `intent://open?url=${encodeURIComponent(url)}&title=${title}#Intent;scheme=wvc-x-callback;package=com.instantbits.cast.webvideo;end`
-    window.location.href = intent
-  }, [getStreamUrl])
 
   // Carregar categorias
   const loadCategories = useCallback(async () => {
@@ -368,7 +354,7 @@ export default function SimplePlayerPage() {
 
             <div className="text-center text-xs text-slate-500">
               <p>Funciona com qualquer servidor Xtream Codes</p>
-              <p className="mt-1">▶ Player (MX/VLC/Kodi) • 🟣 Chromecast • 📋 Copiar</p>
+              <p className="mt-1">▶ Player (MX/VLC/Kodi) • 📋 Copiar URL</p>
             </div>
           </div>
         )}
@@ -398,15 +384,6 @@ export default function SimplePlayerPage() {
                         className="h-8 w-8 p-0"
                       >
                         <Play className="h-4 w-4 text-emerald-500" />
-                      </Button>
-                      <Button
-                        onClick={() => openFixedWvc(channel)}
-                        variant="ghost"
-                        size="sm"
-                        title="Chromecast"
-                        className="h-8 w-8 p-0"
-                      >
-                        <Cast className="h-4 w-4 text-purple-500" />
                       </Button>
                       <Button
                         onClick={() => copyFixedUrl(channel.id)}
@@ -484,15 +461,6 @@ export default function SimplePlayerPage() {
                       title="Selecionar player (MX, VLC, Kodi...)"
                     >
                       <Play className="h-4 w-4 text-emerald-500" />
-                    </Button>
-                    {/* Web Video Caster - Chromecast específico */}
-                    <Button
-                      onClick={() => openWvc(channel)}
-                      variant="ghost"
-                      size="sm"
-                      title="Web Video Caster (Chromecast)"
-                    >
-                      <Cast className="h-4 w-4 text-purple-500" />
                     </Button>
                     {/* Copiar URL */}
                     <Button
