@@ -22,9 +22,15 @@ interface Channel {
 // Canais fixos (sempre disponíveis)
 const FIXED_CHANNELS = [
   {
-    id: 'jornal-paraiba',
-    name: 'Jornal da Paraiba',
+    id: 'jornal-paraiba-1',
+    name: 'Jornal da Paraiba 1',
     url: 'https://171942.global.ssl.fastly.net/61df20a18ecf869e0a58a4fc/live_029d87c0746511ec978d3983d0d34e88/tracks-v1a1/mono.ts.m3u8',
+    icon: '📺'
+  },
+  {
+    id: 'jornal-paraiba-2',
+    name: 'Jornal da Paraiba 2',
+    url: 'https://171942.global.ssl.fastly.net/61df20a18ecf869e0a58a4fc/live_04cbdcf0841d11ecbd1e2f70fab15b4e/tracks-v1a1/mono.ts.m3u8',
     icon: '📺'
   }
 ]
@@ -370,28 +376,26 @@ export default function SimplePlayerPage() {
         {/* Categorias */}
         {categories.length > 0 && !selectedCategory && (
           <div className="pt-4 space-y-6">
-            {/* Campeonato Paraibano - Canal Fixo */}
+            {/* Campeonato Paraibano - Canais Fixos (Grid Compacto) */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Radio className="h-5 w-5 text-red-500" />
                 <h2 className="text-lg font-bold">Campeonato Paraibano</h2>
               </div>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
                 {FIXED_CHANNELS.map((channel) => (
                   <div
                     key={channel.id}
-                    className="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
+                    className="flex flex-col p-2 bg-slate-800 rounded-lg border border-slate-700 hover:border-red-500/50"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{channel.icon}</span>
-                      <span className="font-medium">{channel.name}</span>
-                    </div>
-                    <div className="flex gap-1">
+                    <span className="font-medium text-sm text-center mb-2">{channel.name}</span>
+                    <div className="flex justify-center gap-1">
                       <Button
                         onClick={() => openFixedChannel(channel.url)}
                         variant="ghost"
                         size="sm"
-                        title="Selecionar player (MX, VLC, Kodi...)"
+                        title="Player"
+                        className="h-8 w-8 p-0"
                       >
                         <Play className="h-4 w-4 text-emerald-500" />
                       </Button>
@@ -399,7 +403,8 @@ export default function SimplePlayerPage() {
                         onClick={() => openFixedWvc(channel)}
                         variant="ghost"
                         size="sm"
-                        title="Web Video Caster (Chromecast)"
+                        title="Chromecast"
+                        className="h-8 w-8 p-0"
                       >
                         <Cast className="h-4 w-4 text-purple-500" />
                       </Button>
@@ -407,7 +412,8 @@ export default function SimplePlayerPage() {
                         onClick={() => copyFixedUrl(channel.id)}
                         variant="ghost"
                         size="sm"
-                        title="Copiar URL"
+                        title="Copiar"
+                        className="h-8 w-8 p-0"
                       >
                         {copiedId === channel.id ? (
                           <Check className="h-4 w-4 text-green-500" />
