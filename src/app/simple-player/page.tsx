@@ -56,44 +56,28 @@ export default function SimplePlayerPage() {
     return `http://${fullHost}/live/${username}/${password}/${streamId}.m3u8`
   }, [host, serverUrl, username, password])
 
-  // Abrir seletor de players (MÉTODO CORRETO 2025)
+  // Abrir seletor de players - MÉTODO UNIVERSAL 2025
   const openExternalChooser = useCallback((channel: Channel) => {
     const url = getStreamUrl(channel.stream_id)
-
-    // Método 1: Intent genérico com chooser (mais confiável)
-    const intentChooser = `intent://play/?url=${encodeURIComponent(url)}#Intent;action=android.intent.action.VIEW;type=video/*;category=android.intent.category.BROWSABLE;end`
-
-    // Método 2: Universal para PWAs/Android TV (recomendado)
-    const universalIntent = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;type=application/x-mpegURL;end`
-
-    // Tenta universal primeiro, fallback para chooser
-    try {
-      window.location.href = universalIntent
-
-      // Fallback após 500ms se não funcionar
-      setTimeout(() => {
-        window.location.href = intentChooser
-      }, 500)
-
-    } catch {
-      window.location.href = url
-    }
+    openPlayer(url)
   }, [getStreamUrl])
 
   // Abrir canal fixo no seletor de players
   const openFixedChannel = useCallback((url: string) => {
-    const intentChooser = `intent://play/?url=${encodeURIComponent(url)}#Intent;action=android.intent.action.VIEW;type=video/*;category=android.intent.category.BROWSABLE;end`
-    const universalIntent = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;type=application/x-mpegURL;end`
-
-    try {
-      window.location.href = universalIntent
-      setTimeout(() => {
-        window.location.href = intentChooser
-      }, 500)
-    } catch {
-      window.location.href = url
-    }
+    openPlayer(url)
   }, [])
+
+  // Função universal para abrir player
+  const openPlayer = (url: string) => {
+    // Remove http:// ou https:// para construir o intent
+    const urlWithoutScheme = url.replace(/^https?:\/\//, '')
+    
+    // Intent universal que abre o seletor de apps no Android
+    const intent = `intent://${urlWithoutScheme}#Intent;scheme=http;action=android.intent.action.VIEW;type=video/*;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(url)};end`
+    
+    // Tenta o intent primeiro
+    window.location.href = intent
+  }
 
   // Carregar categorias
   const loadCategories = useCallback(async () => {
