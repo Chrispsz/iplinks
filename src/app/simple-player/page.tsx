@@ -69,13 +69,25 @@ export default function SimplePlayerPage() {
 
   // Função universal para abrir player
   const openPlayer = (url: string) => {
+    // Detecta se é m3u8 para tipo correto
+    const isM3u8 = url.includes('.m3u8')
+    const mimeType = isM3u8 ? 'application/x-mpegURL' : 'video/*'
+    
     // Remove http:// ou https:// para construir o intent
     const urlWithoutScheme = url.replace(/^https?:\/\//, '')
     
-    // Intent universal que abre o seletor de apps no Android
-    const intent = `intent://${urlWithoutScheme}#Intent;scheme=http;action=android.intent.action.VIEW;type=video/*;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(url)};end`
+    // Intent universal com múltiplos tipos para máxima compatibilidade
+    // Funciona em: Android Phone, Android TV, PWA, Chrome
+    const intent = `intent://${urlWithoutScheme}#Intent;` +
+      `scheme=http;` +
+      `action=android.intent.action.VIEW;` +
+      `type=${mimeType};` +
+      `type=video/*;` +
+      `category=android.intent.category.BROWSABLE;` +
+      `category=android.intent.category.DEFAULT;` +
+      `S.browser_fallback_url=${encodeURIComponent(url)};` +
+      `end`
     
-    // Tenta o intent primeiro
     window.location.href = intent
   }
 
