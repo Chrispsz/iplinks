@@ -47,17 +47,20 @@ export default function HomePage() {
   }, [host, serverUrl, username, password])
 
   const openInApp = useCallback((url: string) => {
-    // Scheme customizado iplinks:// - exclusivo para nosso app
-    // AndroidManifest: <data android:scheme="iplinks" android:host="play" />
-    // App lê: intent.getStringExtra("stream_url")
+    // Android nativo - abre URL e o sistema mostra seletor de apps
+    // Qualquer player de vídeo pode ser usado (VLC, MX Player, nosso app, etc.)
+    // O usuário escolhe qual player prefere
+    //
+    // Nosso app captura via intent-filter do AndroidManifest:
+    // - <data android:scheme="http" />
+    // - <data android:mimeType="video/*" />
+    // - <data android:pathPattern=".*\\.m3u8" />
     
     const isAndroid = /android/i.test(navigator.userAgent)
     
     if (isAndroid) {
-      // Scheme customizado direto - sem intent:// wrapper
-      // Formato: iplinks://play?stream_url=...
-      const encodedUrl = encodeURIComponent(url)
-      window.location.href = `iplinks://play?stream_url=${encodedUrl}`
+      // Simplesmente abre a URL - Android mostra seletor de apps
+      window.location.href = url
     } else {
       // Desktop/outros - abre em nova aba
       window.open(url, '_blank')
