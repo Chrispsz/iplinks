@@ -47,20 +47,18 @@ export default function HomePage() {
   }, [host, serverUrl, username, password])
 
   const openInApp = useCallback((url: string) => {
-    // Android nativo - abre URL e o sistema mostra seletor de apps
-    // Qualquer player de vídeo pode ser usado (VLC, MX Player, nosso app, etc.)
-    // O usuário escolhe qual player prefere
+    // Chrome Intent para Android - mostra seletor de apps
+    // O sistema Android mostra todos os apps que podem reproduzir vídeo
+    // VLC, MX Player, nosso app, etc.
     //
-    // Nosso app captura via intent-filter do AndroidManifest:
-    // - <data android:scheme="http" />
-    // - <data android:mimeType="video/*" />
-    // - <data android:pathPattern=".*\\.m3u8" />
+    // Formato: intent://<url_sem_scheme>#Intent;scheme=http;action=VIEW;type=video/*;end
     
     const isAndroid = /android/i.test(navigator.userAgent)
     
     if (isAndroid) {
-      // Simplesmente abre a URL - Android mostra seletor de apps
-      window.location.href = url
+      // Chrome Intent - força Android a mostrar seletor de apps
+      const intent = `intent://` + url.replace(/^https?:\/\//, '') + `#Intent;scheme=http;action=android.intent.action.VIEW;type=video/*;end`
+      window.location.href = intent
     } else {
       // Desktop/outros - abre em nova aba
       window.open(url, '_blank')
