@@ -47,37 +47,17 @@ export default function HomePage() {
   }, [host, serverUrl, username, password])
 
   const openInApp = useCallback((url: string) => {
-    // Chrome Intent para Android - preferência para nosso app
-    // Formato: intent://<host>/<path>#Intent;scheme=<scheme>;package=<pkg>;S.<extra>=<value>;end
-    // 
-    // Comportamento:
-    // 1. Se IPLINKS Player instalado → abre direto
-    // 2. Se não instalado → Android abre seletor com outros players
-    // 3. Se nenhum player → abre navegador (fallback)
-    // 
-    // App lê: intent.getStringExtra("stream_url") ou intent.getData()
+    // Scheme customizado iplinks:// - exclusivo para nosso app
+    // AndroidManifest: <data android:scheme="iplinks" android:host="play" />
+    // App lê: intent.getStringExtra("stream_url")
     
     const isAndroid = /android/i.test(navigator.userAgent)
     
     if (isAndroid) {
-      // Parse da URL para montar o intent
-      const urlObj = new URL(url)
-      
-      // Chrome Intent format
-      const intent = [
-        'intent://' + urlObj.host + urlObj.pathname + urlObj.search,
-        '#Intent',
-        'scheme=' + urlObj.protocol.replace(':', ''),
-        'action=android.intent.action.VIEW',
-        'category=android.intent.category.BROWSABLE',
-        'category=android.intent.category.DEFAULT',
-        `package=${APP_PACKAGE}`,                        // Preferência: nosso app
-        `S.stream_url=${encodeURIComponent(url)}`,       // Extra para nosso app
-        'type=video/*',
-        'end'
-      ].join(';')
-      
-      window.location.href = intent
+      // Scheme customizado direto - sem intent:// wrapper
+      // Formato: iplinks://play?stream_url=...
+      const encodedUrl = encodeURIComponent(url)
+      window.location.href = `iplinks://play?stream_url=${encodedUrl}`
     } else {
       // Desktop/outros - abre em nova aba
       window.open(url, '_blank')
