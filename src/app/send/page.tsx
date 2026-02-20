@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { Send, Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -22,138 +22,118 @@ export default function SendPage() {
     
     const parsed = AccountManager.parseCredentials(credentials)
     
-    console.log('[Send] Parsed credentials:', { 
-      host: parsed.host, 
-      username: parsed.username,
-      hasPassword: !!parsed.password 
-    })
-    
     if (!parsed.host || !parsed.username || !parsed.password) {
       setStatus('error')
-      setErrorMessage('Credenciais inválidas. Verifique o formato.')
+      setErrorMessage('Credenciais inválidas')
       return
     }
 
     try {
-      console.log(`[Send] Sending credentials to code: ${code}`)
-      
       const res = await fetch('/api/tv-pair', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'credentials',
-          code,
-          credentials: {
-            host: parsed.host,
-            username: parsed.username,
-            password: parsed.password
-          }
-        })
+        body: JSON.stringify({ action: 'credentials', code, credentials: { host: parsed.host, username: parsed.username, password: parsed.password } })
       })
 
       const data = await res.json()
-      console.log('[Send] Response:', data)
       
       if (data.success) {
         setStatus('success')
       } else {
         setStatus('error')
-        setErrorMessage(data.error || 'Erro ao enviar credenciais')
+        setErrorMessage(data.error || 'Erro ao enviar')
       }
-    } catch (error) {
-      console.error('[Send] Error:', error)
+    } catch {
       setStatus('error')
-      setErrorMessage('Erro de conexão. Verifique sua internet.')
+      setErrorMessage('Erro de conexão')
     }
-  }
-
-  const handleReset = () => {
-    setStatus('idle')
-    setErrorMessage('')
   }
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold">Enviado!</h2>
-          <p className="text-slate-400 mt-2">A TV vai conectar automaticamente</p>
-        </div>
+      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4 sm:p-6">
+        <CheckCircle className="h-16 w-16 sm:h-20 sm:w-20 text-green-500 mx-auto mb-4 sm:mb-6" />
+        <h2 className="text-2xl sm:text-3xl font-bold">Enviado!</h2>
+        <p className="text-base sm:text-lg text-slate-400 mt-2 sm:mt-4">A TV conectou automaticamente</p>
       </div>
     )
   }
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
-        <div className="text-center max-w-md px-4">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Erro</h2>
-          <p className="text-slate-400 mb-6">{errorMessage}</p>
-          <Button onClick={handleReset} className="bg-blue-600 hover:bg-blue-700">
-            Tentar Novamente
-          </Button>
-        </div>
+      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-4 sm:p-6">
+        <AlertCircle className="h-16 w-16 sm:h-20 sm:w-20 text-red-500 mx-auto mb-4 sm:mb-6" />
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">Erro</h2>
+        <p className="text-base sm:text-lg text-slate-400 mb-6 sm:mb-8">{errorMessage}</p>
+        <Button onClick={() => { setStatus('idle'); setErrorMessage('') }} className="h-12 sm:h-16 px-6 sm:px-8 text-lg sm:text-xl bg-blue-600">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <header className="fixed top-0 left-0 right-0 bg-slate-800 border-b border-slate-700 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={() => window.location.href = '/'}>
-            <ArrowLeft className="h-4 w-4" />
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 bg-slate-800 border-b border-slate-700 z-50 h-14 sm:h-20">
+        <div className="container mx-auto px-3 sm:px-6 h-full flex items-center gap-3 sm:gap-4">
+          <Button variant="ghost" className="h-10 w-10 sm:h-14 sm:w-14 hover:bg-slate-700" onClick={() => window.location.href = '/'}>
+            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
-          <h1 className="font-bold">Enviar Credenciais</h1>
+          <div>
+            <h1 className="text-lg sm:text-2xl font-bold">Enviar para TV</h1>
+            <p className="text-xs sm:text-sm text-slate-400 hidden sm:block">Envie credenciais para uma TV</p>
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-24">
-        <div className="max-w-md mx-auto space-y-6">
+      <main className="container mx-auto px-4 sm:px-6 pb-8" style={{ paddingTop: '4.5rem' }}>
+        <div className="max-w-lg mx-auto pt-4 sm:pt-8 space-y-6 sm:space-y-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold">Digite o código da TV</h2>
-            <p className="text-slate-400 text-sm mt-1">3 dígitos que aparecem na tela da TV</p>
+            <h2 className="text-2xl sm:text-3xl font-bold">Digite o código da TV</h2>
+            <p className="text-base sm:text-lg text-slate-400 mt-1 sm:mt-2">Código de 3 dígitos mostrado na TV</p>
           </div>
 
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4 space-y-4">
+          <Card className="bg-slate-800 border-2 border-slate-700">
+            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              {/* Code Input */}
               <div className="space-y-2">
-                <label className="text-sm text-slate-400">Código</label>
+                <label className="text-sm sm:text-base text-slate-400">Código</label>
                 <Input
                   type="text"
-                  placeholder="Ex: 123"
+                  placeholder="123"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 3))}
-                  className="text-center text-2xl font-mono h-14 bg-slate-900 border-slate-700"
+                  className="text-center text-4xl sm:text-6xl font-mono h-16 sm:h-24 bg-slate-900 border-2 border-slate-700 focus:border-blue-500"
                   maxLength={3}
                 />
               </div>
 
+              {/* Credentials Input */}
               <div className="space-y-2">
-                <label className="text-sm text-slate-400">Credenciais IPTV</label>
+                <label className="text-sm sm:text-base text-slate-400">Credenciais IPTV</label>
                 <Textarea
                   placeholder="Cole suas credenciais...&#10;&#10;Servidor: servidor.com:80&#10;Usuário: usuario&#10;Senha: senha"
                   value={credentials}
                   onChange={(e) => setCredentials(e.target.value)}
-                  className="min-h-[120px] bg-slate-900 border-slate-700"
+                  className="min-h-[160px] sm:min-h-[200px] bg-slate-900 border-2 border-slate-700 text-base sm:text-lg focus:border-blue-500"
                 />
               </div>
 
+              {/* Send Button */}
               <Button
                 onClick={handleSend}
                 disabled={status === 'sending' || code.length !== 3 || !credentials.trim()}
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+                className="w-full h-12 sm:h-16 text-lg sm:text-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
               >
                 {status === 'sending' ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mr-2 sm:mr-3" />
                     Enviando...
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 mr-2" />
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
                     ENVIAR
                   </>
                 )}
@@ -161,9 +141,7 @@ export default function SendPage() {
             </CardContent>
           </Card>
 
-          <div className="text-center text-xs text-slate-500">
-            <p>Certifique-se de que a TV está na tela de código</p>
-          </div>
+          <p className="text-center text-sm sm:text-base text-slate-500">Certifique-se de que a TV está mostrando o código</p>
         </div>
       </main>
     </div>
