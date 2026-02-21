@@ -1,14 +1,16 @@
 # Media Server Client
 
-A web-based client for managing multiple server connections with automatic latency detection.
+A web-based client for managing multiple server connections with automatic latency detection and load balancing.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
-- **Server Selection** - Automatically measures and selects the fastest server
-- **Multi-Server Support** - Configure multiple server connections
-- **TV Integration** - Pairing system for TV devices without keyboard input
-- **External Player Support** - Open streams in external applications
-- **Responsive UI** - Works on desktop and mobile devices
+- 🔍 **Server Selection** - Automatically measures and selects the fastest server
+- 🌐 **Multi-Server Support** - Configure multiple server connections
+- 📺 **TV Integration** - Pairing system for TV devices without keyboard input
+- 🔗 **External Player Support** - Open streams in external applications
+- 📱 **Responsive UI** - Works on desktop and mobile devices
 
 ## Installation
 
@@ -33,11 +35,12 @@ bun run dev
 
 ## Tech Stack
 
-- Next.js 16
-- React 19
-- TypeScript 5
-- Tailwind CSS 4
-- shadcn/ui components
+| Technology | Version |
+|------------|---------|
+| Next.js | 16 |
+| React | 19 |
+| TypeScript | 5 |
+| Tailwind CSS | 4 |
 
 ## License
 
